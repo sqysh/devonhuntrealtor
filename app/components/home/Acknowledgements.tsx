@@ -18,13 +18,13 @@ const Acknowledgements = () => {
         <div className="flex flex-col justify-center items-center py-16 px-8 border-b md:border-l col-span-12 md:col-span-3 border-white">
           <FontAwesomeIcon icon={faCrown} className="w-8 h-8 mb-4 text-white" />
           <p className="text-white font-bold text-center">
-            4+ Years of Experience
+            5+ Years of Experience
           </p>
         </div>
         <div className="flex flex-col justify-center items-center py-16 px-8 border-b md:border-l col-span-12 md:col-span-3 border-white">
           <FontAwesomeIcon icon={faUsers} className="w-8 h-8 mb-4 text-white" />
           <p className="text-white font-bold text-center">
-            50+ Satisfied Clients
+            100+ Satisfied Clients
           </p>
         </div>
         <div className="flex flex-col justify-center items-center py-16 px-8 border-b md:border-l col-span-12 md:col-span-3 border-white">

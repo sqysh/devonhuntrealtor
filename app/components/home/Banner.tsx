@@ -49,7 +49,7 @@ const Banner = () => {
       <div className="absolute z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center flex-col w-full h-full flex items-center justify-center bg-black/40">
         <div className="flex items-center mb-10">
           <h1 className="text-3xl sm:text-4xl md:text-6xl text-white whitespace-nowrap font-bold">
-            Devon Hunt
+            Devon Hunt ABR®
           </h1>
           <div className="mx-3 md:mx-8 h-16 w-0.5 bg-[#f067a6]"></div>
           <p className="text-3xl sm:text-4xl md:text-6xl text-white whitespace-nowrap font-bold">
