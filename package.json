@@ -1,6 +1,6 @@
 {
   "name": "devon-nextjs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -12,7 +12,6 @@
     "generate": "prisma generate"
   },
   "dependencies": {
-    "@chakra-ui/react": "^2.8.2",
     "@fortawesome/fontawesome-svg-core": "^6.5.1",
     "@fortawesome/free-brands-svg-icons": "^6.5.1",
     "@fortawesome/free-regular-svg-icons": "^6.5.1",
@@ -21,11 +20,11 @@
     "@prisma/client": "^5.7.1",
     "@reduxjs/toolkit": "^2.2.4",
     "bcrypt": "^5.1.1",
-    "firebase": "^10.12.2",
+    "firebase": "^11.9.1",
     "jsonwebtoken": "^9.0.2",
-    "next": "14.2.12",
-    "react": "^18",
-    "react-dom": "^18",
+    "next": "^15.5.7",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
     "react-redux": "^9.1.2",
     "redux-persist": "^6.0.0",
     "uifx": "^2.0.7"
@@ -36,7 +35,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
-    "eslint-config-next": "14.2.5",
+    "eslint-config-next": "^15.5.7",
     "postcss": "^8",
     "prisma": "^5.15.1",
     "tailwindcss": "^3.4.1",
