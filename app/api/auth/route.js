@@ -1,7 +1,5 @@
-'use server'
-
 import { NextResponse } from 'next/server.js'
-import bcrypt from 'bcrypt'
+import argon2 from 'argon2'
 import prisma from '../../../prisma/client.ts'
 import generateToken from '../../../utils/generateToken.ts'
 
@@ -23,7 +21,7 @@ export async function POST(req) {
           { status: 404 }
         )
 
-      const hashedPassword = await bcrypt.hash(user.password, 10)
+      const hashedPassword = await argon2.hash(user.password)
 
       const createdUser = await prisma.user.create({
         data: {
@@ -71,9 +69,9 @@ export async function POST(req) {
         )
       }
 
-      const isPasswordValid = await bcrypt.compare(
-        user.password,
-        existingUser.password
+      const isPasswordValid = await argon2.verify(
+        existingUser.password,
+        user.password
       )
 
       if (!isPasswordValid) {

@@ -7,9 +7,9 @@ if (!process.env.JWT_SECRET) {
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-const generateToken = (user: any, expiresIn: string) =>
+const generateToken = (user: any, expiresIn: string | number): string =>
   jwt.sign(user ?? { username: generateRandomString(30) }, JWT_SECRET, {
     expiresIn,
-  });
+  } as jwt.SignOptions);
 
 export default generateToken;
