@@ -77,7 +77,7 @@ export default function HomeHero() {
         ref={videoRef}
         aria-hidden="true"
         tabIndex={-1}
-        poster="/images/home-hero-loading.png"
+        poster="/images/home-hero-loading.jpg"
         className={`absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-700 ${
           isReady ? "opacity-100" : "opacity-0"
         }`}
