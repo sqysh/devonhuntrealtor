@@ -1,45 +1,297 @@
-@import "tailwindcss/base";
+@import "tailwindcss";
 
-@import "tailwindcss/components";
+/* OS-driven dark mode. No class, no JS, no flash — the browser applies
+   it before first paint. Switch back to `&:where(.dark, .dark *)` only if
+   an in-app toggle is ever added. */
+@custom-variant dark (@media (prefers-color-scheme: dark));
 
-@import "tailwindcss/utilities";
+/* ============================================================
+   1. PALETTE — fixed values, identical in both modes.
+   Nothing in the app should reference these directly; the
+   semantic tokens in section 2 decide which rung each mode uses.
+   ============================================================ */
 
-body {
-  margin: 0;
-  padding: 0;
-  color: #121212;
+:root {
+  /* Proper Nest pink, sampled from the brand rules and icons */
+  --pink-50: #fdf2f7;
+  --pink-100: #fce7f1;
+  --pink-200: #fbcfe3;
+  --pink-300: #f7a8c8;
+  --pink-400: #f27ba9;
+  --pink-500: #e8458b; /* brand pink — rules, icons, underlines */
+  --pink-600: #d22e74; /* 4.8:1 on white — safe for text and buttons */
+  --pink-700: #b02260;
+  --pink-800: #8e1d4f;
+  --pink-900: #741b43;
+
+  /* Neutrals, very slightly cool to sit under the pink */
+  --ink-50: #f7f7f9;
+  --ink-100: #ededf1;
+  --ink-200: #dcdce3;
+  --ink-300: #b9b9c4;
+  --ink-400: #8a8a99;
+  --ink-500: #63636f;
+  --ink-600: #4a4a54;
+  --ink-700: #35353d;
+  --ink-800: #1f1f25;
+  --ink-900: #131316;
+  --ink-950: #0b0b0e;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+/* ============================================================
+   2. SEMANTIC TOKENS — the only thing components should use.
+   ============================================================ */
+
+:root {
+  color-scheme: light;
+
+  --background: #ffffff;
+  --surface: #ffffff; /* cards, header, dropdowns */
+  --surface-raised: #ffffff; /* modals, popovers */
+  --surface-sunken: var(--ink-50); /* alternating sections, inputs */
+
+  --foreground: var(--ink-900);
+  --muted-foreground: var(--ink-600); /* body copy under headings */
+  --subtle-foreground: var(--ink-400); /* captions, disabled, meta */
+
+  --border: var(--ink-200);
+  --border-strong: var(--ink-300);
+
+  --primary: var(--pink-500);
+  --primary-hover: var(--pink-600);
+  --primary-foreground: #ffffff;
+  --primary-subtle: var(--pink-50); /* tinted backgrounds, badges */
+
+  /* Interactive pink that still passes AA on white — use for
+     text links and any button that carries white label text. */
+  --primary-accessible: var(--pink-600);
+
+  --rule: var(--pink-500); /* nav underline, card foot, section divider */
+  --ring: var(--pink-600);
+
+  /* Text and marks that sit ON a pink fill. Same in both modes — the
+     rule is light enough in each that near-black is the readable
+     partner (5.2:1 on pink-500, higher on pink-400). */
+  --on-rule: var(--ink-950);
+
+  --success: #0f7a52;
+  --success-subtle: #e7f5ef;
+  --warning: #9a6300;
+  --warning-subtle: #fdf3e0;
+  --danger: #c0264a;
+  --danger-subtle: #fdeced;
+
+  --shadow-color: 218 14% 20%;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --background: var(--ink-950);
+    --surface: var(--ink-900);
+    --surface-raised: var(--ink-800);
+    --surface-sunken: #08080a;
+
+    --foreground: #f4f4f7;
+    --muted-foreground: #a8a8b4;
+    --subtle-foreground: #71717f;
+
+    --border: #26262e;
+    --border-strong: #35353f;
+
+    /* Pink lifts a rung on dark ground: 500 goes muddy, 400 keeps
+       the brand read and clears 7:1 against --background. */
+    --primary: var(--pink-400);
+    --primary-hover: var(--pink-300);
+    --primary-foreground: var(--ink-950);
+    --primary-subtle: color-mix(in oklab, var(--pink-500) 16%, transparent);
+
+    --primary-accessible: var(--pink-400);
+
+    --rule: var(--pink-400);
+    --ring: var(--pink-300);
+
+    --success: #4ade9f;
+    --success-subtle: color-mix(in oklab, #4ade9f 14%, transparent);
+    --warning: #f0b849;
+    --warning-subtle: color-mix(in oklab, #f0b849 14%, transparent);
+    --danger: #f4788c;
+    --danger-subtle: color-mix(in oklab, #f4788c 14%, transparent);
+
+    --shadow-color: 0 0% 0%;
   }
 }
 
-::-webkit-scrollbar {
-  width: 8px;
+/* ============================================================
+   3. TAILWIND THEME — maps tokens to utilities.
+   `inline` is required: without it Tailwind snapshots the value
+   at build time and dark mode never swaps.
+   ============================================================ */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-subtle-foreground: var(--subtle-foreground);
+
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-subtle: var(--primary-subtle);
+  --color-primary-accessible: var(--primary-accessible);
+
+  --color-rule: var(--rule);
+  --color-on-rule: var(--on-rule);
+  --color-ring: var(--ring);
+
+  --color-success: var(--success);
+  --color-success-subtle: var(--success-subtle);
+  --color-warning: var(--warning);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-danger: var(--danger);
+  --color-danger-subtle: var(--danger-subtle);
+
+  /* Raw ramp, for the rare case a semantic token doesn't fit */
+  --color-brand-50: var(--pink-50);
+  --color-brand-100: var(--pink-100);
+  --color-brand-200: var(--pink-200);
+  --color-brand-300: var(--pink-300);
+  --color-brand-400: var(--pink-400);
+  --color-brand-500: var(--pink-500);
+  --color-brand-600: var(--pink-600);
+  --color-brand-700: var(--pink-700);
+  --color-brand-800: var(--pink-800);
+  --color-brand-900: var(--pink-900);
+
+  /* Wire these to next/font in layout.tsx (see notes at bottom) */
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
+
+  /* The design's cards are near-square — keep radii tight */
+  --radius-card: 3px;
+  --radius-control: 2px;
+
+  /* Site shell — matches The Proper Nest's 1400px cap */
+  --container-site: 87.5rem;
+
+  --shadow-card: 0 12px 32px -14px hsl(var(--shadow-color) / 0.28);
+  --shadow-raised: 0 24px 60px -20px hsl(var(--shadow-color) / 0.36);
 }
 
-::-webkit-scrollbar-track {
-  background: #0d0d0d;
+/* ============================================================
+   4. BASE
+   ============================================================ */
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  /* Suppress the cross-fade during a theme swap so colors snap
+     rather than smearing. Set the attribute on <html> around the
+     class toggle, then remove it on the next frame. */
+  [data-theme-switching] *,
+  [data-theme-switching] *::before,
+  [data-theme-switching] *::after {
+    transition: none !important;
+  }
 }
 
-::-webkit-scrollbar-thumb {
-  background-color: #505059;
-  border-radius: 10px;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background-color: #505059;
-}
+/* ============================================================
+   5. SMALL COMPONENT PRIMITIVES
+   Optional — delete if you'd rather compose in JSX.
+   ============================================================ */
 
-.input-box:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
-  box-shadow: 0 0 0 1000px transparent inset !important;
-  -webkit-text-fill-color: #121212 !important;
-  color: #121212 !important;
-  background-color: transparent !important;
-  background-clip: border-box !important;
-  transition: background-color 5000s ease-in-out 0s !important;
-  font-size: 16px !important;
+@layer components {
+  /**
+   * Horizontal rhythm for every full-width section. Put the section's
+   * background on the outer element and .shell on the inner one, so
+   * backgrounds bleed edge to edge while content stops at 1400px.
+   */
+  .shell {
+    margin-inline: auto;
+    width: 100%;
+    max-width: var(--container-site);
+    padding-inline: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .shell {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .shell {
+      padding-inline: 2rem;
+    }
+  }
+
+  /* The card treatment from the hero: white face, pink foot rule */
+  .card-foot-rule {
+    background-color: var(--surface);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    border-bottom: 3px solid var(--rule);
+  }
+
+  /* The nav underline on the active link */
+  .nav-link-active {
+    position: relative;
+    color: var(--foreground);
+  }
+
+  .nav-link-active::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: -6px;
+    height: 2px;
+    background-color: var(--rule);
+  }
 }

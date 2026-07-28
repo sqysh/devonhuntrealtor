@@ -42,6 +42,23 @@ model Contact {
   inquiryType   String?
   message       String?
   contactTime   String?
+  // Honeypot — must be empty on legitimate submissions.
+  // Never displayed in UI, never emailed to Devon.
+  website       String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  // Request metadata
+  ip            String?
+  userAgent     String?
+  device        String?
+  browser       String?
+  os            String?
+  referer       String?
+  origin        String?
+  language      String?
+  geoLatitude   Float?
+  geoLongitude  Float?
+  geoCity       String?
+  geoRegion     String?
+  geoCountry    String?
 }

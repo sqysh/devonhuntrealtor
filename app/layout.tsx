@@ -1,31 +1,20 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import PageWrapper from "./page-wrapper";
-import { Suspense } from "react";
-import Spinner from "./components/Spinner";
+import { RootLayoutWrapper } from "./(public)/(home)/root-layout";
+import { siteMetadata, siteViewport } from "@/lib/metadata";
+import JsonLd from "@/components/seo/JsonLd";
 
-const inter = Inter({ subsets: ["latin"] });
+// `variable` rather than `className` — globals.css maps --font-body into
+// the Tailwind theme, so the utility `font-sans` resolves to Inter.
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
+});
 
-export const metadata: Metadata = {
-  title: `Devon Hunt - Realtor ®`,
-  description: "Massachusetts Realtor",
-  metadataBase: new URL("https://www.devonhuntrealtor.com/"),
-  openGraph: {
-    type: "website",
-    url: "https://www.devonhuntrealtor.com/",
-    title: "Devon Hunt - Realtor ®",
-    description: "Massachusetts Realtor",
-    images: [
-      {
-        url: "https://firebasestorage.googleapis.com/v0/b/devon-hunt-nextjs.appspot.com/o/images%2Fdevon-rich-preview-2.png?alt=media&token=0d35d862-bf52-4af0-81d4-835314c1c5db",
-        width: 1200,
-        height: 630,
-        alt: "Devon Hunt - Realtor ®",
-      },
-    ],
-  },
-};
+export const metadata: Metadata = siteMetadata;
+export const viewport: Viewport = siteViewport;
 
 export default function RootLayout({
   children,
@@ -34,19 +23,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <meta property="fb:app_id" content="583844026116727" />
-      </head>
-      <body className={inter.className}>
-        <Suspense
-          fallback={
-            <div className="min-h-screen w-full flex justify-center pt-36">
-              <Spinner fill="fill-pink-300" wAndH="w-10 h-10" />
-            </div>
-          }
-        >
-          <PageWrapper>{children}</PageWrapper>
-        </Suspense>
+      <body className={`${inter.variable} font-sans`}>
+        <RootLayoutWrapper>{children}</RootLayoutWrapper>
+        <JsonLd />
       </body>
     </html>
   );
