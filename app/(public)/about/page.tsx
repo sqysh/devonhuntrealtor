@@ -64,7 +64,7 @@ export default function AboutPage() {
               </div>
 
               <Picture
-                src="/images/devon-cutout.png"
+                src="/images/devon-02.png"
                 alt="Devon Hunt"
                 className="relative z-10 h-auto w-full object-contain"
                 priority
@@ -75,30 +75,23 @@ export default function AboutPage() {
           <div className="md:col-span-7 lg:col-span-8">
             <div className="max-w-[62ch] space-y-6 text-base leading-relaxed text-muted-foreground">
               <p className="text-xl leading-snug text-foreground lg:text-2xl">
-                I played drums in Boston bands for years before I ever sold a
-                house. The useful part wasn&rsquo;t the timing &mdash; it was
-                learning to read a room and knowing when not to overplay.
+                I play drums in The Iron Roses. It sounds like it has nothing to
+                do with real estate, but you learn to read a room fast, and you
+                learn that the job is mostly listening.
               </p>
               <p>
-                Since 2020 I&rsquo;ve helped over 150 people buy, sell, and rent
-                across Massachusetts &mdash; first-time buyers, families
-                outgrowing a place, investors, and people who just needed
-                someone to tell them straight whether a listing was worth it.
+                Since 2020 I&rsquo;ve helped more than 150 people buy, sell, and
+                rent around Massachusetts. First-time buyers, families
+                who&rsquo;ve outgrown their place, investors, and plenty of
+                people who just wanted someone to tell them honestly whether a
+                house was worth it.
               </p>
               <p>
-                I&rsquo;ve spent years on the other side of the table. I know
-                which repairs a buyer will fixate on and which ones
-                they&rsquo;ll never mention, what makes an offer come in soft,
-                and where a buyer&rsquo;s agent will push once the inspection
-                comes back. We price against what buyers are actually doing
-                right now, not what a listing down the street is asking.
-              </p>
-              <p>
-                I work out of Marblehead and know the North Shore well &mdash;
-                partly from selling here, partly from a decade of load-ins at
-                every club between Salem and Newburyport. If you&rsquo;re
-                somewhere else in the state, I&rsquo;m happy to travel or point
-                you toward someone who knows that market cold.
+                I&rsquo;m based in Marblehead and I know the North Shore, partly
+                from working here and partly from years of hauling a kit into
+                clubs up and down the coast. If you&rsquo;re somewhere else in
+                the state, I&rsquo;ll travel, or I&rsquo;ll point you toward
+                someone who really knows your area.
               </p>
             </div>
             <dl className="mt-12 border-b border-border">
