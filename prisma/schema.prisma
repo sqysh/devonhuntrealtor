@@ -34,7 +34,7 @@ model Testimonial {
 }
 
 model Contact {
-  id            Int      @id @default(autoincrement())
+  id            Int     @id @default(autoincrement())
   name          String?
   email         String?
   phone         String?
@@ -42,23 +42,68 @@ model Contact {
   inquiryType   String?
   message       String?
   contactTime   String?
-  // Honeypot — must be empty on legitimate submissions.
-  // Never displayed in UI, never emailed to Devon.
   website       String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  // Request metadata
-  ip            String?
-  userAgent     String?
-  device        String?
-  browser       String?
-  os            String?
-  referer       String?
-  origin        String?
-  language      String?
-  geoLatitude   Float?
-  geoLongitude  Float?
-  geoCity       String?
-  geoRegion     String?
-  geoCountry    String?
+
+  // Spam triage. Nothing is discarded; suspicious rows are marked and
+  // filtered out of the default admin view.
+  flagged     Boolean @default(false)
+  flagReason  String?
+  elapsedMs   Int?
+  tokenStatus String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ip           String?
+  userAgent    String?
+  device       String?
+  browser      String?
+  os           String?
+  referer      String?
+  origin       String?
+  language     String?
+  geoLatitude  Float?
+  geoLongitude Float?
+  geoCity      String?
+  geoRegion    String?
+  geoCountry   String?
+
+  @@index([flagged, createdAt])
+}
+
+enum LogLevel {
+  INFO
+  WARN
+  ERROR
+}
+
+model Log {
+  id    Int      @id @default(autoincrement())
+  level LogLevel @default(INFO)
+
+  /// Dot-namespaced event key, e.g. "contact.created", "contact.flagged".
+  /// Query by prefix to pull everything for a feature.
+  event String
+
+  /// One human-readable line. What you'd want to read in a table row.
+  message String
+
+  /// Anything structured worth keeping: ids, reasons, timings, errors.
+  context Json?
+
+  /// Who or what the entry is about. Email, "system", "anonymous".
+  actor String?
+
+  createdAt DateTime @default(now())
+
+  ip        String?
+  device    String?
+  browser   String?
+  os        String?
+  geoCity   String?
+  geoRegion String?
+
+  @@index([event, createdAt])
+  @@index([level, createdAt])
+  @@index([createdAt])
 }

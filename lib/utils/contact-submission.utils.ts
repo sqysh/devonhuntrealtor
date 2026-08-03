@@ -1,15 +1,18 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import "server-only";
 
-const SECRET = process.env.FORM_TOKEN_SECRET ?? process.env.NEXTAUTH_SECRET;
+const SECRET =
+  process.env.FORM_TOKEN_SECRET ??
+  process.env.AUTH_SECRET ??
+  process.env.NEXTAUTH_SECRET;
 
 /**
  * Heuristics tuned against the submissions actually coming through:
  * random-case gibberish in every text field, an email-to-SMS gateway
  * address, and a phone number with the wrong digit count.
  *
- * Every check returns a reason string so rejections can be logged and
- * reviewed. Nothing here is user-facing.
+ * Every check returns a reason string. Only the honeypot discards a
+ * submission; the rest mark the row for review.
  */
 
 /** Email-to-SMS gateways. Never a legitimate contact address on a form. */
@@ -41,6 +44,10 @@ const DISPOSABLE_DOMAINS = [
  * Random-string detector. Real words alternate vowels and consonants and
  * don't switch case mid-token; generated junk like "DvJUoFQFujmZJoj"
  * fails on both counts.
+ *
+ * Deliberately not run against names. Surnames legitimately break every
+ * rule here (Krzyzewski is 20% vowels), and a rejected name is a lost
+ * client.
  */
 function looksGenerated(value: string): boolean {
   const token = value.trim();
@@ -67,7 +74,7 @@ function looksGenerated(value: string): boolean {
   }
   const chaoticCase = flips / letters.length > 0.4;
 
-  // Four or more consonants in a row.
+  // Five or more consonants in a row.
   const consonantRun = /[bcdfghjklmnpqrstvwxyz]{5,}/i.test(letters);
 
   return lowVowels || chaoticCase || consonantRun;
@@ -87,13 +94,12 @@ export function checkSubmission(input: {
   // 1. Honeypot.
   if (input.website) return { spam: true, reason: "honeypot" };
 
-  // 2. Submitted faster than a person can type. A direct POST reports
-  //    nothing at all, which is itself disqualifying.
+  // 2. No valid token means the form was never rendered, which points at
+  //    a direct POST to the action. There is no timing floor: any bot
+  //    that can obtain a token can also wait, so a floor only penalises
+  //    fast humans.
   if (input.elapsedMs === undefined) {
     return { spam: true, reason: "no-timing-token" };
-  }
-  if (input.elapsedMs < 3000) {
-    return { spam: true, reason: `too-fast:${input.elapsedMs}ms` };
   }
 
   const email = input.email?.trim().toLowerCase() ?? "";
@@ -115,9 +121,8 @@ export function checkSubmission(input: {
     }
   }
 
-  // 5. Generated text in any field the bots fill.
+  // 5. Generated text. Name is excluded on purpose — see looksGenerated.
   for (const [field, value] of Object.entries({
-    name: input.name,
     message: input.message,
     contactTime: input.contactTime,
   })) {
@@ -139,8 +144,16 @@ export function checkSubmission(input: {
   return { spam: false };
 }
 
+/**
+ * Returns an empty string rather than throwing when the secret is
+ * missing. Throwing here 500s the whole contact page, which is a far
+ * worse outcome than losing one layer of spam defence.
+ */
 export function mintFormToken(): string {
-  if (!SECRET) throw new Error("FORM_TOKEN_SECRET is not set");
+  if (!SECRET) {
+    console.error("[formToken] no secret set — token checks are disabled");
+    return "";
+  }
 
   const issued = Date.now().toString();
   const sig = createHmac("sha256", SECRET).update(issued).digest("hex");
@@ -160,6 +173,8 @@ export function verifyFormToken(token?: string): TokenCheck {
 
   const [issued, sig] = token.split(".");
   if (!issued || !sig) return { valid: false, reason: "malformed" };
+  if (!/^\d+$/.test(issued)) return { valid: false, reason: "bad-timestamp" };
+  if (!/^[0-9a-f]+$/i.test(sig)) return { valid: false, reason: "malformed" };
 
   const expected = createHmac("sha256", SECRET).update(issued).digest("hex");
 
@@ -170,7 +185,6 @@ export function verifyFormToken(token?: string): TokenCheck {
   }
 
   const elapsedMs = Date.now() - Number(issued);
-  if (Number.isNaN(elapsedMs)) return { valid: false, reason: "bad-timestamp" };
   if (elapsedMs < 0) return { valid: false, reason: "future-timestamp" };
   if (elapsedMs > MAX_AGE_MS) return { valid: false, reason: "expired" };
 
