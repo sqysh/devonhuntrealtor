@@ -9,6 +9,10 @@ import { buildLogMessage } from "@/lib/utils/_log.client.utils";
 import { getRequestDetails } from "@/lib/utils/_log.server.utils";
 import prisma from "@/prisma/client";
 import { after } from "next/server";
+import {
+  checkSubmission,
+  verifyFormToken,
+} from "@/lib/utils/contact-submission.utils";
 
 export type CreateContactInput = {
   name?: string;
@@ -20,6 +24,7 @@ export type CreateContactInput = {
   contactTime?: string;
   /** Honeypot — must be empty. Filled = bot. */
   website?: string;
+  formToken?: string;
 };
 
 export type CreateContactResult =
@@ -41,13 +46,23 @@ export async function createContact(
   input: CreateContactInput,
 ): Promise<CreateContactResult> {
   try {
-    // Honeypot check — silently succeed so bots don't learn they were
-    // caught. Nothing is stored and no mail goes out.
-    if (input.website) {
+    const req = await getRequestDetails();
+    const token = verifyFormToken(input.formToken);
+
+    const verdict = checkSubmission({
+      ...input,
+      elapsedMs: token.valid ? token.elapsedMs : undefined,
+    });
+
+    if (verdict.spam) {
+      console.warn("[createContact] rejected", {
+        reason: verdict.reason,
+        tokenReason: token.valid ? null : token.reason,
+        ip: req.ip,
+        email: input.email,
+      });
       return { ok: true, id: -1 };
     }
-
-    const req = await getRequestDetails();
 
     const contact = await prisma.contact.create({
       data: {
